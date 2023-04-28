@@ -1,3 +1,3 @@
-export function realTax (tax, inflaction) {
-    return ((1+tax)/(1+inflaction)) - 1
+export function realTax (i, inflaction) {
+    return ((1+i)/(1+inflaction)) - 1
 }
