@@ -31,16 +31,16 @@ function App() {
 
       }}
       onSubmit={(values) => {
-        setData(values)
         let decimalRentability = values.rentability / 100
         let decimalInflaction = values.inflaction / 100
         let taxLiquid = realTax(decimalRentability, decimalInflaction)
         let numberOfPeriods = values.ageRetired - values.ageCurrent
         let currentPayments = values.contributionRecurrent
         let initialPatrimonialValue = values.contributionInitial
-
+        
+        setData(values)
         setCalculated(true)
-          setFvCalculated(
+        setFvCalculated(
           fv(taxLiquid, numberOfPeriods, currentPayments, initialPatrimonialValue)
         )
       }}
