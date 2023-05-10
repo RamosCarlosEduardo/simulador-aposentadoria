@@ -2,4 +2,4 @@
 @tailwind components;
 @tailwind utilities;
 @import "primereact/resources/themes/nano/theme.css";
-@import "primereact/resources/primereact.min.css";
+@import "primereact/resources/primereact.css";
