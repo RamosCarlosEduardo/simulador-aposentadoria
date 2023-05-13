@@ -5,7 +5,5 @@
 @import "primereact/resources/primereact.min.css";
 
 .p-button {
-    background: #4E9BC7 !important;
     background: #0694DB !important;
-    
 }
