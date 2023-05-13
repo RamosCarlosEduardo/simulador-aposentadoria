@@ -9,7 +9,7 @@ import { RxDividerVertical } from "react-icons/rx";
 import { InputNumber } from "primereact/inputnumber";
 import { Button } from 'primereact/button';
 import "primereact/resources/primereact.min.css";                                       
-import "primereact/resources/themes/nano/theme.css"
+// import "primereact/resources/themes/nano/theme.css"
         
 
 function App() {
