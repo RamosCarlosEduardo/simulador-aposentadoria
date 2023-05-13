@@ -1,21 +1,20 @@
 import { useRef, useState } from "react";
 import "./App.css";
 import { useFormik } from "formik";
-import { fv } from "./utils/futureValue";
-import { realTax } from "./utils/realTax";
+import { fv, realTax, nper, taxYearToMonth } from "./utils/financials";
 import { formataBRL } from "./utils/formatCurrency";
 import { MdOutlineLightMode, MdModeNight } from "react-icons/md";
 import { RxDividerVertical } from "react-icons/rx";
 import { InputNumber } from "primereact/inputnumber";
 import { Button } from 'primereact/button';
-//import "primereact/resources/themes/nano/theme.css"
-//import "primereact/resources/primereact.min.css";                                       
-    
+
 
 function App() {
   const [calculated, setCalculated] = useState(false);
-  const [fvCalculated, setFvCalculated] = useState();
+  const [results, setResults] = useState({});
   const [data, setData] = useState({});
+  const [retiredDuration, setRetiredDuration] = useState(0)
+  const [retiredAge, setRetiredAge] = useState(0)
   const divRoot = useRef(null);
 
   function switchTheme() {
@@ -39,12 +38,21 @@ function App() {
       let numberOfPeriods = values.ageRetired - values.ageCurrent;
       let currentPayments = values.contributionRecurrent;
       let initialPatrimonialValue = values.contributionInitial;
-
+      let retiredIncome = values.retiredIncome
+      
+      let fvCalc = fv(taxYearToMonth(taxLiquid), numberOfPeriods*12, currentPayments, initialPatrimonialValue)
+      let nperCalc = nper(taxYearToMonth(taxLiquid), fvCalc, retiredIncome, 0)
+            
       setData(values);
       setCalculated(true);
-      setFvCalculated(
-        fv(taxLiquid, numberOfPeriods, currentPayments, initialPatrimonialValue)
-      );
+      setRetiredAge(formik.values.ageRetired)
+      setResults({
+        fvCalc,
+        nperCalc
+      });
+      setRetiredDuration(Math.floor(nperCalc / 12))
+
+      setTimeout(() => document.activeElement.blur(), 200)
     },
   });
 
@@ -52,7 +60,7 @@ function App() {
     <div className="grid place-content-center h-screen bg-zinc-500" ref={divRoot}>
 
     <form
-      className="flex flex-col w-fit items-center text-center border-2 border-blue-200 bg-zinc-50 dark:text-white dark:bg-zinc-800 rounded-md gap-3 p-5"
+      className="flex flex-col w-[700px] items-center text-center border-2 border-blue-200 bg-zinc-50 dark:text-white dark:bg-zinc-800 rounded-md gap-3 p-5"
       onSubmit={formik.handleSubmit}
     >
       <div className="flex justify-end self-start ml-5 rounded-sm p-1 ring-1 ring-slate-400">
@@ -70,11 +78,11 @@ function App() {
           max="120"
           value={formik.values.ageCurrent}
           onValueChange={(e) => {formik.setFieldValue("ageCurrent", e.value)}}
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
       <div className="flex justify-between w-full px-5 gap-5">
-        <label htmlFor="ageRetired" className="">Idade para aposentar</label>
+        <label htmlFor="ageRetired" className="">Idade para começar a viver de renda</label>
         <InputNumber
           id="ageRetired"
           name="ageRetired"
@@ -82,11 +90,11 @@ function App() {
           max="120"
           value={formik.values.ageRetired}
           onValueChange={(e) => {formik.setFieldValue("ageRetired", e.value)}}
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
       <div className="flex justify-between w-full px-5 gap-5">
-        <label htmlFor="contributionInitial" className="">Aporte inicial</label>
+        <label htmlFor="contributionInitial" className="">Patrimônio acumulado</label>
         <InputNumber
           id="contributionInitial"
           name="contributionInitial"
@@ -95,8 +103,8 @@ function App() {
           mode="currency"
           currency="BRL"
           showButtons
-          step="100"
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          step="1000"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
       <div className="flex justify-between w-full px-5 gap-5">
@@ -109,12 +117,12 @@ function App() {
           mode="currency"
           currency="BRL"
           showButtons
-          step="100"
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          step="1000"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
       <div className="flex justify-between w-full px-5 gap-5">
-        <label htmlFor="retiredIncome" className="">Renda esperada após aposentadoria</label>
+        <label htmlFor="retiredIncome" className="">Renda esperada após aposentadoria (mensal)</label>
         <InputNumber
           id="retiredIncome"
           name="retiredIncome"
@@ -123,12 +131,12 @@ function App() {
           mode="currency"
           currency="BRL"
           showButtons
-          step="100"
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          step="1000"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
        <div className="flex justify-between w-full px-5 gap-5">
-        <label htmlFor="rentability" className="">Rentabilidade anual</label>
+        <label htmlFor="rentability" className="">Rentabilidade esperada (anual)</label>
         <InputNumber
           id="rentability"
           name="rentability"
@@ -136,13 +144,13 @@ function App() {
           onValueChange={(e) => {formik.setFieldValue("rentability", e.value)}}
           suffix="%"
           showButtons
-          step=".01"
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          step=".1"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
       
       <div className="flex justify-between w-full px-5 gap-5">
-        <label htmlFor="inflaction" className="">Inflação esperada anual</label>
+        <label htmlFor="inflaction" className="">Inflação esperada (anual)</label>
         <InputNumber
           id="inflaction"
           name="inflaction"
@@ -150,21 +158,24 @@ function App() {
           onValueChange={(e) => {formik.setFieldValue("inflaction", e.value)}}
           suffix="%"
           showButtons
-          step=".01"
-          className="ring-1 ring-blue-300 rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
+          step=".1"
+          className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
         />
       </div>
       <Button
+        type="submit"
         label="Calcular"
         className=" overflow-hidden px-4 py-2 text-zinc-900 dark:text-zinc-50"
       />
-        
-      <span className="h-4">
+      <div className="h-16">
         {calculated &&
-          `Até os ${data.ageRetired} anos, você terá acumulado: ${formataBRL(
-            fvCalculated
-          )}`}
-      </span>
+          <span className="block text-start max-w-full">
+            Até os {data.ageRetired} anos, você terá acumulado: <span className="font-bold">{formataBRL(results.fvCalc)}</span>. <br/>
+            Você poderá receber o valor de {formataBRL(formik.values.retiredIncome)} mensalmente por aproximadamente <span className="font-bold">{retiredDuration} anos. </span>
+            Você terá {retiredAge + retiredDuration} anos de idade.
+          </span>
+        }
+      </div>
     </form>
     </div>
   );

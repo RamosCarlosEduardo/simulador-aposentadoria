@@ -3,3 +3,9 @@
 @import "tailwindcss/utilities";
 @import "primereact/resources/themes/nano/theme.css";
 @import "primereact/resources/primereact.min.css";
+
+.p-button {
+    background: #4E9BC7 !important;
+    background: #0694DB !important;
+    
+}
