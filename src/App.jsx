@@ -101,7 +101,7 @@ function App() {
           value={formik.values.contributionInitial}
           onValueChange={(e) => {formik.setFieldValue("contributionInitial", e.value)}}
           mode="currency"
-          currency="BRL"
+          currency="USD"
           showButtons
           step="1000"
           className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
@@ -115,7 +115,7 @@ function App() {
           value={formik.values.contributionRecurrent}
           onValueChange={(e) => {formik.setFieldValue("contributionRecurrent", e.value)}}
           mode="currency"
-          currency="BRL"
+          currency="USD"
           showButtons
           step="1000"
           className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
@@ -129,7 +129,7 @@ function App() {
           value={formik.values.retiredIncome}
           onValueChange={(e) => {formik.setFieldValue("retiredIncome", e.value)}}
           mode="currency"
-          currency="BRL"
+          currency="USD"
           showButtons
           step="1000"
           className="rounded text-center outline-none focus:shadow-sm focus:shadow-cyan-400 dark:bg-zinc-500 w-1/3"
