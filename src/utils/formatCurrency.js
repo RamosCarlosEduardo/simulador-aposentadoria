@@ -1,6 +1,6 @@
 export const formataBRL = (value) => {
     const formatador = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
+      style: 'decimal',
       currency: 'BRL',
       minimumFractionDigits: 2,
     });
